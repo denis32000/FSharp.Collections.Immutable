@@ -4,7 +4,6 @@ type IQueue<'T> = System.Collections.Immutable.IImmutableQueue<'T>
 
 type Queue<'T> = System.Collections.Immutable.ImmutableQueue<'T>
 
-
 [<RequireQualifiedAccess; CompiledName("ImmutableStackModule")>]
 module Queue =
 
@@ -23,9 +22,8 @@ module Queue =
     let enqueue item queue: IQueue<_> = check queue; queue.Enqueue item
 
     let head queue = check queue; queue.Peek()
-    
-    let tail queue: IQueue<_> = check queue; queue.Dequeue()
 
+    let tail queue: IQueue<_> = check queue; queue.Dequeue()
 
     //////////
 
@@ -56,30 +54,23 @@ module Queue =
 
     let iter action queue = check queue; Seq.iter action queue
     let iteri action queue = check queue; Seq.iteri action queue
-    let iter2 action (queue1: IQueue<_>) (queue2: IQueue<_>) = 
+    let iter2 action (queue1: IQueue<_>) (queue2: IQueue<_>) =
         checkNotNull "queue1" queue1
         checkNotNull "queue2" queue2
         Seq.iter2 action queue1 queue2
-
 
     let fold folder state queue = check queue; Seq.fold folder state queue
 
     let forall predicate queue = check queue; Seq.forall predicate
 
     let exists predicate queue = check queue; Seq.exists predicate queue
-    
-
-
-
 
     let reduce reduction queue = check queue; Seq.reduce reduction queue
 
     let inline sum queue = check queue; Seq.sum queue
     let inline sumBy projection queue = check queue; Seq.sumBy projection queue
-    
+
     let inline average queue = check queue; Seq.average queue
     let inline averageBy projection queue = check queue; Seq.averageBy projection
 
 module ImmutableQueue = Queue
-
-
