@@ -20,7 +20,7 @@ module ImmutableList =
 
     let ofBuilder (builder: ImmutableList<_>.Builder) = builder.ToImmutable()
     let builder() = ImmutableList.CreateBuilder()
-     
+
     open System.Collections.Generic
     open System
 
@@ -33,8 +33,15 @@ module ImmutableList =
     let item index list = check list; list.[index]
 
 
-    ////////// IImmutableList //////////
+    ////////// ImmutableList //////////
 
+    let contains item (list : ImmutableList<_>) = list.Contains(item)
+
+    let reverse (list : ImmutableList<_>) = list.Reverse()
+
+    let reverseRange (index, count) (list : ImmutableList<_>) = list.Reverse(index, count)
+
+    ////////// IImmutableList //////////
 
     /// Replaces an element in the list at a given position with the specified element.
     let withItem index value list = check list; list.SetItem(index, value)
@@ -48,9 +55,9 @@ module ImmutableList =
     /// Returns a new list with the first matching element in the list replaced with the specified element.
     let replace oldValue value list =
         replaceWith HashIdentity.Structural oldValue value list
-        
 
-    /// Creates a list with all the items removed, but with the same sorting and ordering semantics as 
+
+    /// Creates a list with all the items removed, but with the same sorting and ordering semantics as
     /// this list.
     let clear list = check list; list.Clear()
 
@@ -87,7 +94,7 @@ module ImmutableList =
 
     /// Removes all the elements that do not match the conditions defined by the specified predicate.
     let filter predicate list =
-        check list    
+        check list
         Predicate(not << predicate)
         |> list.RemoveAll
 
@@ -106,13 +113,13 @@ module ImmutableList =
     let indexRange index count item list =
         indexRangeWith HashIdentity.Structural index count item list
     let indexFromWith comparer index item list =
-        indexRangeWith comparer index (length list - index) item 
+        indexRangeWith comparer index (length list - index) item
     let indexFrom index item list =
         indexFromWith HashIdentity.Structural index item list
     let indexWith comparer item list =
         indexFromWith comparer 0 item list
     let index item list = indexWith HashIdentity.Structural item list
-    
+
 
     /// Searches for the specified object and returns the zero-based index of the last occurrence within the
     /// range of elements in the list that contains the specified number
@@ -131,27 +138,11 @@ module ImmutableList =
     let lastIndex item list = lastIndexWith HashIdentity.Structural item list
 
 
-    
-    
-    
-
-    ////////
-
-
-    
-
-    ////////
-
-    
-     
-        
-
-
     ////////// Filter-based //////////
 
     let filterFold (predicate: 'State -> 'T -> bool * 'State) initial list =
         let state = ref initial
-        filter (fun item -> 
+        filter (fun item ->
             let condition, state' = predicate !state item
             state := state'
             condition) list, !state
@@ -176,8 +167,6 @@ module ImmutableList =
     let takeUntil predicate list = takeWhile (not << predicate) list
 
     ////////// Building //////////
-
-    
 
     let inline build f =
         let builder = builder()
@@ -249,7 +238,6 @@ module ImmutableList =
     let cons head list = insert 0 head list
 
 
-    
 
 
 
@@ -257,7 +245,6 @@ module ImmutableList =
 
     //let ofArray (array: 'T array) = ImmutableList.Create<'T>(items = [||])
 
-    
 
 
     let init count initializer =
@@ -265,20 +252,20 @@ module ImmutableList =
             // throw the same exception
             try
                 Seq.init count initializer |> ignore
-            with 
+            with
             |exn -> raise exn // get the right stack trace
         build <| fun builder ->
             for i = 0 to count - 1 do
                 builder.Add <| initializer i
+
     let unfold generator state =
         let rec unfoldLoop state (builder: ImmutableList<_>.Builder) =
             match generator state with
             |Some(state, item) -> builder.Add(item); unfoldLoop state builder
             |None -> ()
         build <| unfoldLoop state
-            
 
-    
+
     ////////// Seq-based //////////
 
     let find predicate list = check list; Seq.find predicate list
@@ -286,7 +273,7 @@ module ImmutableList =
     let tryFind predicate list = check list; Seq.tryFind predicate list
 
     let findIndex predicate list = check list; Seq.findIndex predicate list
-    
+
     let tryFindIndex predicate list = check list; Seq.tryFindIndex predicate list
 
     let pick chooser list = check list; Seq.pick chooser list
@@ -300,9 +287,5 @@ module ImmutableList =
         Seq.forall2 predicate list1 list2
 
     let iter action list = check list; Seq.iter action list
-    
+
     let toArray list = check list; Seq.toArray list
-    
-    
-    
-    
